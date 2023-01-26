@@ -1,1 +1,2 @@
-*.xml text working-tree-encoding=UTF-16LE-BOM eol=CRLF
+xml/application/*.xml text working-tree-encoding=UTF-16LE-BOM eol=CRLF
+xml/task-sequence/*.xml text working-tree-encoding=UTF-8 eol=CRLF
