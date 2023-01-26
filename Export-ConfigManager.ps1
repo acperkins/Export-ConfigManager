@@ -21,8 +21,8 @@
 foreach ($d in @(
         "$XmlPath\task-sequence",
         "$XmlPath\application",
-        "$ExportPath\task-sequence\$IsoTime"
-        "$ExportPath\application\$IsoTime"
+        "$ExportPath\$IsoTime\task-sequence"
+        "$ExportPath\$IsoTime\application"
     )) {
     if (-Not (Test-Path -Path $d -PathType Container)) {
         New-Item -Path $d -ItemType Directory | Out-Null
@@ -48,7 +48,7 @@ foreach ($t in $CMTaskSequences) {
     $x.Save("$XmlPath\task-sequence\$FileName.xml")
 
     # Export the ZIP file in a timestamped folder so SCCM can import it.
-    $t | Export-CMTaskSequence -Path "$ExportPath\task-sequence\$IsoTime\$FileName.zip" -WithContent:$false -WithDependence:$false
+    $t | Export-CMTaskSequence -Path "$ExportPath\$IsoTime\task-sequence\$FileName.zip" -WithContent:$false -WithDependence:$false
 }
 
 [int]$i = 0
@@ -64,7 +64,7 @@ foreach ($a in $CMApplications) {
     $x.Save("$XmlPath\application\$FileName.xml")
 
     # Export the ZIP file in a timestamped folder so SCCM can import it.
-    $a | Export-CMApplication -Path "$ExportPath\application\$IsoTime\$FileName.zip" -OmitContent -IgnoreRelated
+    $a | Export-CMApplication -Path "$ExportPath\$IsoTime\application\$FileName.zip" -OmitContent -IgnoreRelated
 }
 
 # Write $IsoTime to a timestamp file
