@@ -67,5 +67,34 @@ foreach ($a in $CMApplications) {
     $a | Export-CMApplication -Path "$ExportPath\$IsoTime\application\$FileName.zip" -OmitContent -IgnoreRelated
 }
 
-# Write $IsoTime to a timestamp file
-Set-Content -Path "$XmlPath\timestamp.txt" -Value $IsoTime
+if ((Get-Command -Name "git.exe") -and (Test-Path -Path "$PSScriptRoot\.git" -PathType Container)) {
+    [bool]$StagedFiles = $false
+    [bool]$ChangedFiles = $false
+    [string[]]$GitStatus = $(git.exe --git-dir="$PSScriptRoot\.git" --work-tree="$PSScriptRoot" status --porcelain=2 --untracked-files=all)
+    foreach ($l in $GitStatus) {
+        if ($l -match "^. A") {
+            $StagedFiles = $true
+            break
+        }
+        if ($l -match "^. \.M") {
+            $ChangedFiles = $true
+        }
+    }
+
+    # Write $IsoTime to a timestamp file. Update it *after* checking for other
+    # changes. Otherwise there will always be a change to commit (this file).
+    Set-Content -Path "$XmlPath\timestamp.txt" -Value $IsoTime
+
+    if (($StagedFiles -eq $false) -and ($ChangedFiles -eq $true)) {
+        git.exe --git-dir="$PSScriptRoot\.git" --work-tree="$PSScriptRoot" add timestamp.txt xml/
+        git --git-dir="$PSScriptRoot\.git" --work-tree="$PSScriptRoot" commit -m "$IsoTime"
+    } else {
+        Write-Warning -Message "Git changes are staged. Not committing."
+    }
+} else {
+    Write-Warning -Message "Git not installed, or not a git repo."
+
+    # Write $IsoTime to a timestamp file. Don't need to do git checks, as git is
+    # not installed/used.
+    Set-Content -Path "$XmlPath\timestamp.txt" -Value $IsoTime
+}
