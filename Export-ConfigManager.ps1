@@ -79,7 +79,7 @@ if ((Get-Command -Name "git.exe") -and (Test-Path -Path "$PSScriptRoot\.git" -Pa
             $StagedFiles = $true
             break
         }
-        if ($l -match "^. \.M") {
+        if (($l -match "^. \.M") -or ($l -match "^\?")) {
             $ChangedFiles = $true
         }
     }
