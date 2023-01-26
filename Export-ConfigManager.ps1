@@ -86,7 +86,7 @@ if ((Get-Command -Name "git.exe") -and (Test-Path -Path "$PSScriptRoot\.git" -Pa
 
     if (($StagedFiles -eq $false) -and ($ChangedFiles -eq $true)) {
         git.exe --git-dir="$PSScriptRoot\.git" --work-tree="$PSScriptRoot" add timestamp.txt xml/
-        git --git-dir="$PSScriptRoot\.git" --work-tree="$PSScriptRoot" commit -m "$IsoTime"
+        git.exe --git-dir="$PSScriptRoot\.git" --work-tree="$PSScriptRoot" --author="Export ConfigManager <export-configmanager@invalid>" commit -m "$IsoTime"
     } elseif ($StagedFiles -eq $true) {
         Write-Warning -Message "Git changes are staged. Not committing."
     } else {
