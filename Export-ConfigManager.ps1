@@ -16,6 +16,7 @@
 [string]$XmlPath = "$PSScriptRoot\xml"
 [string]$ExportPath = "$PSScriptRoot\exports"
 [bool]$CMPSSuppressFastNotUsedCheck = $true  # Disable lazy properties warning.
+[bool]$ExportContent = $false  # Should install files be included in exports?
 
 # Create folders if any are missing.
 foreach ($d in @(
@@ -48,7 +49,11 @@ foreach ($t in $CMTaskSequences) {
     $x.Save("$XmlPath\task-sequence\$FileName.xml")
 
     # Export the ZIP file in a timestamped folder so SCCM can import it.
-    $t | Export-CMTaskSequence -Path "$ExportPath\$IsoTime\task-sequence\$FileName.zip" -WithContent:$false -WithDependence:$false
+    if ($ExportContent) {
+        $t | Export-CMTaskSequence -Path "$ExportPath\$IsoTime\task-sequence\$FileName.zip" -WithContent:$true -WithDependence:$false
+    } else {
+        $t | Export-CMTaskSequence -Path "$ExportPath\$IsoTime\task-sequence\$FileName.zip" -WithContent:$false -WithDependence:$false
+    }
 }
 
 [int]$i = 0
@@ -64,7 +69,11 @@ foreach ($a in $CMApplications) {
     $x.Save("$XmlPath\application\$FileName.xml")
 
     # Export the ZIP file in a timestamped folder so SCCM can import it.
-    $a | Export-CMApplication -Path "$ExportPath\$IsoTime\application\$FileName.zip" -OmitContent -IgnoreRelated
+    if ($ExportContent) {
+        $a | Export-CMApplication -Path "$ExportPath\$IsoTime\application\$FileName.zip" -IgnoreRelated
+    } else {
+        $a | Export-CMApplication -Path "$ExportPath\$IsoTime\application\$FileName.zip" -OmitContent -IgnoreRelated
+    }
 }
 
 # Write $IsoTime to a timestamp file.
